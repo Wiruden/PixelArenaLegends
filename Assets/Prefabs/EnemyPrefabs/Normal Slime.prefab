@@ -15,6 +15,8 @@ GameObject:
   - component: {fileID: 7760514284568056162}
   - component: {fileID: 5945665374278312524}
   - component: {fileID: -4135340182368842502}
+  - component: {fileID: -2179850546263556914}
+  - component: {fileID: 1572857097931168178}
   m_Layer: 0
   m_Name: Normal Slime
   m_TagString: Enemy
@@ -79,7 +81,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1959465679
-  m_SortingLayer: 0
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: -7294240746080377788, guid: 0a8dd9152ab4f6643a5daf1fa2351fb0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -168,19 +170,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7af4fe6989f18b408c7a9dc4dcc86b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  popUpDamagePrefab: {fileID: 7348650019804060903, guid: 0818cd20c3eedbf4fa09bd2a4989fb0a, type: 3}
-  popUpText: {fileID: 4557148700566718763, guid: 0818cd20c3eedbf4fa09bd2a4989fb0a, type: 3}
-  animatorSlime: {fileID: 0}
-  floatingPoints: {fileID: 7204431411697918025, guid: 0db48b65ad3541c469ecad2ac924e45a, type: 3}
+  playerHealthBar: {fileID: 0}
+  maxHealth: 3
+  health: 3
   detectionRange: 5
   attackRange: 1.5
   attackCooldown: 2
   damage: 1
-  lootmultiplier: 1
+  lootMultiplier: 1
+  floatingPoints: {fileID: 7204431411697918025, guid: 0db48b65ad3541c469ecad2ac924e45a, type: 3}
+  popUpText: {fileID: 4557148700566718763, guid: 0818cd20c3eedbf4fa09bd2a4989fb0a, type: 3}
+  popUpDamagePrefab: {fileID: 7348650019804060903, guid: 0818cd20c3eedbf4fa09bd2a4989fb0a, type: 3}
+  animatorSlime: {fileID: 0}
   lootTable:
   - itemPrefab: {fileID: 6728776809201861680, guid: 3b0d82c6adced1a44a9d0a3c7210b58a, type: 3}
     dropChance: 100
-  health: 3
 --- !u!114 &5945665374278312524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -216,3 +220,62 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-2179850546263556914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7361179525852465280}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2867141a228b0c4478be80636bffb486, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBarPrefab: {fileID: 967872278770984469, guid: be730bf2aeee2ea4c8d92817eca058b7, type: 3}
+--- !u!61 &1572857097931168178
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7361179525852465280}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0.08554435, y: 0.28953528}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 4, y: 4}
+    newSize: {x: 1.1875, y: 1.0625}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 3.5920196, y: 2.0258956}
+  m_EdgeRadius: 0

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -17,31 +17,56 @@ public class EnemyAI : MonoBehaviour
 
     private EnemyPathfinding enemyPathfinding;
     private Transform player;
-    public GameObject popUpDamagePrefab;
-    public TMP_Text popUpText;
-    public Animator animatorSlime;
-    public GameObject floatingPoints;
 
+    [Header("Player Health")]
+    [SerializeField] private HealthBar playerHealthBar;
+
+    [Header("Enemy Stats")]
+    public int maxHealth = 3;
+    public int health = 3;
+    private EnemyHealthBarSpawner healthBarSpawner;
     [SerializeField] float detectionRange = 5f;
     [SerializeField] float attackRange = 1.5f;
     [SerializeField] float attackCooldown = 2f;
-    [SerializeField] int damage = 1;
-    [SerializeField] int lootmultiplier = 1;
+    [SerializeField] float damage = 10f;
+    [SerializeField] int lootMultiplier = 1;
     private float lastAttackTime;
+
+    [Header("UI & FX")]
+    public GameObject floatingPoints;
+    public TMP_Text popUpText;
+    public GameObject popUpDamagePrefab;
+    public Animator animatorSlime;
 
     [Header("Loot")]
     public List<LootItem> lootTable = new List<LootItem>();
+
+    private BoxCollider2D damageCollider;
 
     private void Awake()
     {
         enemyPathfinding = GetComponent<EnemyPathfinding>();
         animatorSlime = GetComponent<Animator>();
-        state = State.Roaming;
+        damageCollider = GetComponent<BoxCollider2D>();
 
-        // Assume player is tagged "Player"
+        if (damageCollider != null)
+        {
+            damageCollider.isTrigger = true;
+            damageCollider.enabled = false; // Start disabled
+        }
+
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
+        {
             player = playerObj.transform;
+
+            if (playerHealthBar == null)
+            {
+                playerHealthBar = GetComponent<HealthBar>();
+            }
+        }
+
+        state = State.Roaming;
     }
 
     private void Start()
@@ -89,8 +114,9 @@ public class EnemyAI : MonoBehaviour
                 {
                     if (Time.time - lastAttackTime > attackCooldown)
                     {
-                        AttackPlayer();
+                        animatorSlime.SetTrigger("Attack");
                         lastAttackTime = Time.time;
+                        StartCoroutine(EnableDamageCollider());
                     }
                 }
                 break;
@@ -115,19 +141,18 @@ public class EnemyAI : MonoBehaviour
         return new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
     }
 
-    public int health = 3;
-
     public void TakeDamage(int amount)
     {
         health -= amount;
         popUpText.text = amount.ToString();
         Instantiate(floatingPoints, transform.position, Quaternion.identity);
-        Debug.Log("Enemy took damage! Health: " + health);
 
         if (health <= 0)
         {
             StartCoroutine(Die());
         }
+
+        healthBarSpawner?.UpdateHealthBar(health, maxHealth);
     }
 
     private IEnumerator Die()
@@ -136,7 +161,7 @@ public class EnemyAI : MonoBehaviour
         {
             if (Random.Range(0f, 100f) <= lootItem.dropChance)
             {
-                for (int i = 0; i < lootmultiplier; i++)
+                for (int i = 0; i < lootMultiplier; i++)
                 {
                     InstantiateLoot(lootItem.itemPrefab);
                 }
@@ -144,9 +169,8 @@ public class EnemyAI : MonoBehaviour
         }
 
         animatorSlime.SetTrigger("IsDead");
-        Debug.Log("Enemy defeated!");
-        GetComponent<EnemyAI>().enabled = false;
         state = State.None;
+        GetComponent<CapsuleCollider2D>().enabled = false;
         yield return new WaitForSeconds(2f);
         Destroy(gameObject);
     }
@@ -159,9 +183,41 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    private void AttackPlayer()
+    private IEnumerator EnableDamageCollider()
     {
-        Debug.Log("Enemy attacks the player for " + damage + " damage!");
-        animatorSlime.SetTrigger("Attack");
+        yield return new WaitForSeconds(0.3f); // Attack wind-up
+
+        if (damageCollider != null)
+            damageCollider.enabled = true;
+
+        yield return new WaitForSeconds(0.2f); // Active damage window
+
+        if (damageCollider != null)
+            damageCollider.enabled = false;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (damageCollider.enabled && other.CompareTag("Player"))
+        {
+            DealDamageToPlayer();
+        }
+    }
+
+    public void DealDamageToPlayer()
+    {
+        if (playerHealthBar == null)
+        {
+            playerHealthBar = GetComponent<HealthBar>();
+        }
+
+        if (playerHealthBar != null)
+        {
+            playerHealthBar.TakeDamage(damage);
+        }
+        else
+        {
+            Debug.LogWarning("PlayerHealthBar is null even after FindObjectOfType.");
+        }
     }
 }
